@@ -13,14 +13,15 @@ from torchvision import utils
 # HYPER-PARAMETERS
 load_model = False
 batch_size = 2
-train_size = 64
-val_size = 8
+train_size = 6400
+val_size = 800
 epochs = 15
 lr = 0.005
 weight_decay = 0.01
 momentum = 0.9
 num_class = 8
-num_imgs = 72
+img_num = 6
+small_img_num = 1200
 
 # SET DEVICE
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -38,7 +39,7 @@ def main():
 
     # DATA_LOADER
     data = Dataset(input_path, mask_path)
-    input_imgs, mask_imgs = data.make_tensor(num_imgs)
+    input_imgs, mask_imgs = data.make_tensor(img_num, small_img_num)
     train_loader, val_loader = data.data_loader(input_imgs, mask_imgs, batch_size, train_size, val_size)
 
     # LOAD TRAINED MODEL

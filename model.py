@@ -53,7 +53,7 @@ class Decoder(nn.Module):
 
 class UNet(nn.Module):
     def __init__(self, enc_chs=(3, 64, 128, 256, 512, 1024), dec_chs=(1024, 512, 256, 128, 64), num_class=8,
-                 retain_dim=True, out_sz=(1000, 1000)):
+                 retain_dim=True, out_sz=(100, 100)):
         super().__init__()
         self.encoder = Encoder(enc_chs)
         self.decoder = Decoder(dec_chs)

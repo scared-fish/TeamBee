@@ -17,16 +17,17 @@ class Dataset:
             img = np.array(Image.open(full_input_path).convert("RGB"), dtype=np.float32)
         return img
 
-    def make_tensor(self, num):
+    def make_tensor(self, img_num, small_img_num):
         input_imgs = []
         mask_imgs = []
-        for i in range(1, num+1):
-            full_input_path = self.input_path + str(i) + '.png'
-            full_mask_path = self.mask_path + str(i) + '.png'
-            img = self.transform(full_input_path, full_mask_path, mask=False)
-            mask = self.transform(full_input_path, full_mask_path, mask=True)
-            input_imgs.append(img)
-            mask_imgs.append(mask)
+        for i in range(1, img_num+1):
+            for j in range(1, small_img_num+1):
+                full_input_path = self.input_path + 'img'+str(i) + '/img'+str(i)+'_'+str(j)+'.png'
+                full_mask_path = self.mask_path + 'mask'+str(i) + '/mask'+str(i)+'_'+str(j)+'.png'
+                img = self.transform(full_input_path, full_mask_path, mask=False)
+                mask = self.transform(full_input_path, full_mask_path, mask=True)
+                input_imgs.append(img)
+                mask_imgs.append(mask)
 
         # convert from  (H x W x C) in the range [0, 255] to a
         # torch.FloatTensor of shape (C x H x W) in the range [0.0, 1.0]
