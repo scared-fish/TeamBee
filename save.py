@@ -25,12 +25,13 @@ def save_img(outputs_list):
     # SAVE OUTPUT IMAGES
     for i in range(len(outputs_list)):
         outputs = outputs_list[i]
+        #print("outputs before color_map:" + str(outputs))
         outputs_c = [color_map[i] for i in outputs.cpu()]
         for j in range(len(outputs_c)):
             output = outputs_c[j]/255
-            print(output)
+            #print(output)
             output = torch.from_numpy(output)
             output = output.permute(2,0,1)
-            print(output)
-            print(output.dtype)
+            #print(output)
+            #print(output.dtype)
             utils.save_image(output, './outputs/output'+str(i)+str(j)+'.png')

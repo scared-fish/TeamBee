@@ -4,6 +4,7 @@ from train import train
 from validate import validate
 from save import save_img
 
+from datetime import datetime
 import torch
 from torch import nn, utils
 import torch.optim as optim
@@ -12,10 +13,10 @@ from torchvision import utils
 
 # HYPER-PARAMETERS
 load_model = False
-batch_size = 2
-train_size = 6400
-val_size = 800
-epochs = 15
+batch_size = 300
+train_size = 3200
+val_size = 838
+epochs = 1
 lr = 0.005
 weight_decay = 0.01
 momentum = 0.9
@@ -27,7 +28,7 @@ small_img_num = 1200
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 print(device)
 # PATH
-mask_path = './imgs/labels/'
+mask_path = './imgs/masks/'
 input_path = './imgs/inputs/'
 
 
@@ -50,7 +51,9 @@ def main():
 
     for epoch in range(epochs):
         # TRAINING
+        print(datetime.now())
         train(unet, epoch, optimizer, criterion, train_loader, epochs, device)
+        print(datetime.now())
         
         # SAVE CHECKPOINT
         torch.save(unet.state_dict(), './checkpoint/state_dict_model.pt')

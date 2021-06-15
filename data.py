@@ -21,7 +21,7 @@ class Dataset:
         input_imgs = []
         mask_imgs = []
         for i in range(1, img_num+1):
-            for j in range(1, small_img_num+1):
+            for j in range(164, 837):
                 full_input_path = self.input_path + 'img'+str(i) + '/img'+str(i)+'_'+str(j)+'.png'
                 full_mask_path = self.mask_path + 'mask'+str(i) + '/mask'+str(i)+'_'+str(j)+'.png'
                 img = self.transform(full_input_path, full_mask_path, mask=False)
@@ -38,7 +38,8 @@ class Dataset:
 
     def data_loader(self, inputs, masks, batch_size, train_size, val_size):
         data = TensorDataset(inputs, masks)
-
+        print (len(data))
+        print (sum([train_size, val_size]))
         train_data, val_data = torch.utils.data.random_split(data, [train_size, val_size])
 
         train_loader = DataLoader(dataset=train_data,
