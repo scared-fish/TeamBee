@@ -11,10 +11,10 @@ def validate(model, num_class, val_loader, val_size, batch_size, device, output_
             targets = targets.to(device)
             targets = targets.long()
 
-            outputs = model(images)
-            outputs = outputs.to(device)
+            outputs = model(images.to(device))
+            #outputs = outputs.to(device)
             _, y_pred = torch.max(outputs, dim=1)
-            output_list.append(y_pred)
+            output_list.append((y_pred.cpu().numpy(), targets.cpu().numpy(), images.cpu().numpy()))
 
             # ACCURACY
             acc += multi_acc(y_pred, targets)

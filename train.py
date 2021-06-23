@@ -5,11 +5,11 @@ def train(model, epoch, optimizer, criterion, train_loader, epochs, device):
 
     for i, (images, targets) in enumerate(train_loader):
         targets = targets.to(device)
-        targets = targets.long()
+        #targets = targets.long()
 
         # FORWARD PASS
-        outputs = model(images)
-        outputs = outputs.to(device)
+        outputs = model(images.to(device))
+        #outputs = outputs.to(device)
         loss = criterion(outputs, targets)
 
         # BACKWARD PASS

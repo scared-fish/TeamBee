@@ -12,16 +12,16 @@ class Dataset:
     def transform(self, full_input_path, full_mask_path, mask=False):
         if mask:
             # convert target from RGB to Black-white
-            img = np.array(Image.open(full_mask_path).convert("L"), dtype=np.float32)
+            img = np.array(Image.open(full_mask_path).convert("RGB"), dtype=np.int32)[:, :, 0]
         else:
-            img = np.array(Image.open(full_input_path).convert("RGB"), dtype=np.float32)
+            img = np.array(Image.open(full_input_path).convert("RGB"), dtype=np.float32)[:, :, :1]
         return img
 
     def make_tensor(self, img_num, small_img_num):
         input_imgs = []
         mask_imgs = []
         for i in range(1, img_num+1):
-            for j in range(164, 837):
+            for j in range(1, small_img_num + 1):
                 full_input_path = self.input_path + 'img'+str(i) + '/img'+str(i)+'_'+str(j)+'.png'
                 full_mask_path = self.mask_path + 'mask'+str(i) + '/mask'+str(i)+'_'+str(j)+'.png'
                 img = self.transform(full_input_path, full_mask_path, mask=False)
@@ -33,7 +33,8 @@ class Dataset:
         # torch.FloatTensor of shape (C x H x W) in the range [0.0, 1.0]
 
         input_imgs = torch.FloatTensor(np.array(input_imgs) / 255).permute(0, 3, 1, 2)
-        mask_imgs = torch.FloatTensor(np.array(mask_imgs))
+        input_imgs = (2.0 * input_imgs) - 1.0
+        mask_imgs = torch.LongTensor(np.array(mask_imgs))
         return input_imgs, mask_imgs
 
     def data_loader(self, inputs, masks, batch_size, train_size, val_size):
