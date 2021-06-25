@@ -1,5 +1,5 @@
 from model import UNet
-from data import Dataset
+from data import BeecellsDataset, data_transform, data_loader
 from train import train
 from validate import validate
 from save import save_img
@@ -16,7 +16,7 @@ import tqdm.auto
 
 # HYPER-PARAMETERS
 load_model = False
-batch_size = 64
+batch_size = 2
 train_size = 6400
 val_size = 800
 epochs = 30
@@ -26,6 +26,7 @@ lr = 0.001
 num_class = 8
 img_num = 6
 small_img_num = 1200
+num_crops = 100
 
 # SET DEVICE
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -42,9 +43,9 @@ def main():
     optimizer = optim.Adam(unet.parameters(), lr=lr)
 
     # DATA_LOADER
-    data = Dataset(input_path, mask_path)
-    input_imgs, mask_imgs = data.make_tensor(img_num, small_img_num)
-    train_loader, val_loader = data.data_loader(input_imgs, mask_imgs, batch_size, train_size, val_size)
+    dataset = BeecellsDataset(input_path='./imgs/inputs/', mask_path='./imgs/masks/',
+                              img_num=6)
+    train_loader, val_loader = data_loader(dataset, batch_size, train_size, val_size)
 
     # Calculate class weights.
     weights = np.zeros(shape=(num_class,), dtype=np.float32)
@@ -64,7 +65,7 @@ def main():
     for epoch in tqdm.auto.tqdm(range(epochs)):
         # TRAINING
         print(datetime.now())
-        train(unet, epoch, optimizer, criterion, train_loader, epochs, device)
+        train(unet, epoch, optimizer, criterion, train_loader, epochs, device, data_transform, num_crops)
         print(datetime.now())
         
         # SAVE CHECKPOINT
