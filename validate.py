@@ -29,4 +29,4 @@ def validate(model, num_class, val_loader, val_size, batch_size, device, output_
         print('Validation Dice-Coefficient: {:.3f}'.format(dice))
         print('=' * 60)
 
-    return output_list
+    return output_list, '{:.3f}'.format(acc/(val_size/batch_size)), '{:.3f}'.format(dice)

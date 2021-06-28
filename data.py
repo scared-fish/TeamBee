@@ -58,19 +58,19 @@ from torchvision import transforms
 class BeecellsDataset(Dataset):
     """Bee cells dataset."""
 
-    def __init__(self, input_path, mask_path, img_num, transform=None):
+    def __init__(self, img_num, input_path, mask_path, transform=None):
         """
         Args:
             input_path (string): Path to the original images.
             mask_path (string): Path to the masks.
+            img_num (int): Number of images in total
             transform (callable, optional): Optional transform to be applied
                 on a sample.
-            img_num (int): Number of images in total
         """
         self.input_path = input_path
         self.mask_path = mask_path
-        self.transform = transform
         self.img_num = img_num
+        self.transform = transform
 
     def __len__(self):
         return self.img_num
@@ -86,11 +86,13 @@ class BeecellsDataset(Dataset):
 
         if self.transform:
             sample = self.transform((img, mask))
+        else:
+            sample = (img, mask)
 
         return sample
 
 
-def data_loader(self, dataset, batch_size, train_size, val_size):
+def data_loader(dataset, batch_size, train_size, val_size):
 
     train_data, val_data = torch.utils.data.random_split(dataset, [train_size, val_size])
 

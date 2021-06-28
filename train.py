@@ -29,3 +29,5 @@ def train(model, epoch, optimizer, criterion, train_loader, epochs, device, tran
 
     print('Epoch [{}/{}], training loss: {:.4f}'.format(
             epoch + 1, epochs, loss.item()))
+
+    return '{:.4f}'.format(loss.item())
