@@ -129,10 +129,10 @@ class RandomCrop(object):
 
     def __call__(self, sample):
 
-
         img, mask = sample
 
-        h, w = img.shape[:2]
+        img = img.permute(0,3,1,2)
+        h, w = img.shape[2:]
         new_h, new_w = self.output_size
 
         top = np.random.randint(0, h - new_h)
@@ -154,9 +154,10 @@ class ToTensor(object):
         # convert from  (H x W x C) in the range [0, 255] to a
         # torch.FloatTensor of shape (C x H x W) in the range [0.0, 1.0]
         img, mask = sample
-        img = torch.FloatTensor(np.array(img) / 255).permute(2, 0, 1)
+
+        img = torch.FloatTensor(np.array(img.cpu()) / 255)
         img = (2.0 * img) - 1.0
-        mask = torch.LongTensor(mask)
+        mask = torch.LongTensor(mask.cpu().long())
         return (img, mask)
 
 
@@ -164,8 +165,8 @@ class ToTensor(object):
 data_transform = {'train':
                     transforms.Compose([
                         RandomCrop(10),
-                        transforms.RandomHorizontalFlip(p=0.1),
-                        transforms.RandomRotation((0,360)),
+                        #transforms.RandomHorizontalFlip(p=0.1),
+                        #transforms.RandomRotation((0,360)),
                         ToTensor()
                     ]),
                   'val':
