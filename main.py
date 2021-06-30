@@ -1,5 +1,5 @@
 from model import UNet
-from data import BeecellsDataset, data_transform, data_loader
+from data import BeecellsDataset, SubDataset,  data_transform, data_loader
 from train import train
 from validate import validate
 from save import save_img
@@ -9,7 +9,7 @@ import numpy as np
 import torch
 from torch import nn, utils
 import torch.optim as optim
-from torchvision import utils
+from torch.utils.data import DataLoader
 
 import tqdm.auto
 
@@ -44,7 +44,15 @@ def main():
 
     # DATA_LOADER
     dataset = BeecellsDataset(img_num, input_path='./imgs/inputs/', mask_path='./imgs/masks/')
-    train_loader, val_loader = data_loader(dataset, batch_size, train_size, val_size)
+    train_data, val_data = torch.utils.data.random_split(dataset, [train_size, val_size])
+    train_set = SubDataset(train_data, transform=data_transform['train'])
+    val_set = SubDataset(val_data, transform=data_transform['val'])
+    train_loader = DataLoader(dataset=train_set,
+                              batch_size=batch_size,
+                              shuffle=True)
+    val_loader = DataLoader(dataset=val_set,
+                            batch_size=batch_size,
+                            shuffle=False)
 
     # Calculate class weights.
     weights = np.zeros(shape=(num_class,), dtype=np.float32)
