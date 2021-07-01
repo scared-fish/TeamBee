@@ -1,20 +1,19 @@
-from torchvision import transforms
-from data import RandomCrop, ToTensor, data_transform
-from torch.utils.data import ConcatDataset
-from torchvision.transforms.functional import to_pil_image
-from PIL import Image
-
 def train(model, epoch, optimizer, criterion, train_loader, epochs, device):
 
     model.train()
 
-    for i, (images, targets) in enumerate(train_loader):
+    for (images, targets) in train_loader:
+        print(images.shape)
+        print(targets.shape)
+
         targets = targets.to(device)
-        #targets = targets.long()
+        targets = targets.long()
 
         # FORWARD PASS
         outputs = model(images.to(device))
         #outputs = outputs.to(device)
+        print(targets.shape)
+        print(outputs.shape)
         loss = criterion(outputs, targets)
 
         # BACKWARD PASS

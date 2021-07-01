@@ -4,7 +4,7 @@ import os
 from PIL import Image
 from torch.utils.data import DataLoader, TensorDataset, Dataset, ConcatDataset
 from torchvision import transforms
-from transforms import RandomCrop, RandomHorizontalFlip, RandomVerticalFlip, ToTensor
+from transforms import RandomCrop, RandomHorizontalFlip, RandomVerticalFlip, ToTensor, Compose
 
 class BeecellsDataset(Dataset):
     """Bee cells dataset."""
@@ -29,7 +29,7 @@ class BeecellsDataset(Dataset):
 
         full_input_path = self.input_path+str(idx)+'.png'
         full_mask_path = self.mask_path+str(idx)+'.png'
-        img = np.array(Image.open(full_input_path).convert("RGB"), dtype=np.int32)[:, :, :1]
+        img = np.array(Image.open(full_input_path).convert("RGB"), dtype=np.float32)[:, :, :1]
         mask = np.array(Image.open(full_mask_path).convert("RGB"), dtype=np.int32)[:, :, 0]
 
         return img, mask
@@ -43,8 +43,10 @@ class SubDataset(Dataset):
 
     def __getitem__(self, index):
         x, y = self.subset[index]
+        #print(str(self.transform))
+        #print("x:" + str(x) + "\n y:" + str(y))
         if self.transform:
-            x = self.transform(x)
+            x, y= self.transform(x, y)
         return x, y
 
     def __len__(self):
@@ -52,16 +54,16 @@ class SubDataset(Dataset):
 
 # add augmentations here
 data_transform = {'train':
-                    transforms.Compose([
+                    Compose([
+                        ToTensor(),
                         RandomCrop(100),
                         RandomHorizontalFlip(0.5),
-                        RandomVerticalFlip(0.5),
-                        ToTensor()
+                        RandomVerticalFlip(0.5)
                     ]),
                   'val':
-                    transforms.Compose([
-                        RandomCrop(100),
-                        ToTensor()
+                    Compose([
+                        ToTensor(),
+                        RandomCrop(100)
                     ])}
 
 

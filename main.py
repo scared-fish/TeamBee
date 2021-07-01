@@ -1,5 +1,5 @@
 from model import UNet
-from data import BeecellsDataset, SubDataset,  data_transform, data_loader
+from data import BeecellsDataset, SubDataset,  data_transform
 from train import train
 from validate import validate
 from save import save_img
@@ -19,13 +19,13 @@ load_model = False
 batch_size = 64
 train_size = 5
 val_size = 1
-epochs = 1
+epochs = 10
 lr = 0.007
 #weight_decay = 0.01
 #momentum = 0.9
 num_class = 8
 img_num = 6
-small_img_num = 1200
+#small_img_num = 1200
 num_crops = 100
 
 # SET DEVICE
@@ -50,6 +50,7 @@ def main():
     train_loader = DataLoader(dataset=train_set,
                               batch_size=batch_size,
                               shuffle=True)
+    print(str(train_loader))
     val_loader = DataLoader(dataset=val_set,
                             batch_size=batch_size,
                             shuffle=False)
@@ -74,9 +75,9 @@ def main():
 
     for epoch in tqdm.auto.tqdm(range(epochs)):
         # TRAINING
-        print(datetime.now())
-        loss_v = train(unet, epoch, optimizer, criterion, train_loader, epochs, device, data_transform, num_crops)
-        print(datetime.now())
+        #print(datetime.now())
+        loss_v = train(unet, epoch, optimizer, criterion, train_loader, epochs, device)
+        #print(datetime.now())
         
         # SAVE CHECKPOINT
         torch.save(unet.state_dict(), './checkpoint/state_dict_model.pt')
