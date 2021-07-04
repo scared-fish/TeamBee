@@ -11,6 +11,7 @@ def validate(model, num_class, val_loader, val_size, batch_size, device, output_
         for images, targets in val_loader:
             targets = targets.to(device)
             targets = targets.long()
+            print(targets.shape)
 
             outputs = model(images.to(device))
             _, y_pred = torch.max(outputs, dim=1)
@@ -21,7 +22,6 @@ def validate(model, num_class, val_loader, val_size, batch_size, device, output_
             # ONE-HOT ENCODING
             targets = torch.nn.functional.one_hot(targets, num_class)
             y_pred = torch.nn.functional.one_hot(y_pred, num_class)
-            #print("targets:" + str(targets) + "; y_pred:" + str(y_pred))
             # DICE COEFFICIENT
             dice = dice_coefficient(y_pred, targets)
 

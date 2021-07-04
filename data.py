@@ -1,9 +1,7 @@
 import numpy as np
 import torch
-import os
 from PIL import Image
-from torch.utils.data import DataLoader, TensorDataset, Dataset, ConcatDataset
-from torchvision import transforms
+from torch.utils.data import Dataset
 from transforms import RandomCrop, RandomHorizontalFlip, RandomVerticalFlip, ToTensor, Compose
 
 class BeecellsDataset(Dataset):
@@ -42,15 +40,14 @@ class SubDataset(Dataset):
         self.transform = transform
 
     def __getitem__(self, index):
+        index = index % len(self.subset)
         x, y = self.subset[index]
-        #print(str(self.transform))
-        #print("x:" + str(x) + "\n y:" + str(y))
         if self.transform:
             x, y= self.transform(x, y)
         return x, y
 
     def __len__(self):
-        return len(self.subset)
+        return len(self.subset)*64
 
 # add augmentations here
 data_transform = {'train':
@@ -65,23 +62,3 @@ data_transform = {'train':
                         ToTensor(),
                         RandomCrop(100)
                     ])}
-
-
-# def data_loader(dataset, batch_size, train_size, val_size):
-#
-#     train_data, val_data = torch.utils.data.random_split(dataset, [train_size, val_size])
-#
-#     train_loader = DataLoader(dataset=train_data,
-#                               batch_size=batch_size,
-#                               shuffle=True)
-#     val_loader = DataLoader(dataset=val_data,
-#                             batch_size=batch_size,
-#                             shuffle=False)
-#
-#     return train_loader, val_loader
-
-
-
-
-
-

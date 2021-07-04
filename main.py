@@ -4,10 +4,9 @@ from train import train
 from validate import validate
 from save import save_img
 import matplotlib.pyplot as plt
-from datetime import datetime
 import numpy as np
 import torch
-from torch import nn, utils
+from torch import nn
 import torch.optim as optim
 from torch.utils.data import DataLoader
 
@@ -50,7 +49,6 @@ def main():
     train_loader = DataLoader(dataset=train_set,
                               batch_size=batch_size,
                               shuffle=True)
-    print(str(train_loader))
     val_loader = DataLoader(dataset=val_set,
                             batch_size=batch_size,
                             shuffle=False)

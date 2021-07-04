@@ -1,7 +1,5 @@
-import numpy as np
 import random
 
-import torch
 from torchvision import transforms as T
 from torchvision.transforms import functional as F
 
