@@ -44,8 +44,8 @@ def main():
     # DATA_LOADER
     dataset = BeecellsDataset(img_num, input_path='./imgs/inputs/', mask_path='./imgs/masks/')
     train_data, val_data = torch.utils.data.random_split(dataset, [train_size, val_size])
-    train_set = SubDataset(train_data, transform=data_transform['train'])
-    val_set = SubDataset(val_data, transform=data_transform['val'])
+    train_set = SubDataset(train_data,num_crops, transform=data_transform['train'])
+    val_set = SubDataset(val_data,num_crops, transform=data_transform['val'])
     train_loader = DataLoader(dataset=train_set,
                               batch_size=batch_size,
                               shuffle=True)
@@ -60,6 +60,7 @@ def main():
        weights += h
     weights /= weights.sum()
     weights = 1.0 / (num_class * weights)
+    print("weigths:" + str(weights))
     criterion = nn.CrossEntropyLoss(weight=torch.from_numpy(weights).to(device)).to(device)
 
     # LOAD TRAINED MODEL

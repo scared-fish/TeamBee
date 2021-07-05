@@ -17,6 +17,14 @@ class BeecellsDataset(Dataset):
         self.input_path = input_path
         self.mask_path = mask_path
         self.img_num = img_num
+        self.images = []
+        for i in range(img_num):
+            full_input_path = self.input_path+str(i)+'.png'
+            full_mask_path = self.mask_path+str(i)+'.png'
+            img = np.array(Image.open(full_input_path).convert("RGB"), dtype=np.float32)[:, :, :1]
+            mask = np.array(Image.open(full_mask_path).convert("RGB"), dtype=np.int32)[:, :, 0]
+            self.images.append((img,mask))
+
 
     def __len__(self):
         return self.img_num
@@ -25,19 +33,17 @@ class BeecellsDataset(Dataset):
         if torch.is_tensor(idx):
             idx = idx.tolist()
 
-        full_input_path = self.input_path+str(idx)+'.png'
-        full_mask_path = self.mask_path+str(idx)+'.png'
-        img = np.array(Image.open(full_input_path).convert("RGB"), dtype=np.float32)[:, :, :1]
-        mask = np.array(Image.open(full_mask_path).convert("RGB"), dtype=np.int32)[:, :, 0]
+        img, mask = self.images[idx]
 
         return img, mask
 
 
 
 class SubDataset(Dataset):
-    def __init__(self, subset, transform=None):
+    def __init__(self, subset, num_crops=100,transform=None):
         self.subset = subset
         self.transform = transform
+        self.num_crops = num_crops
 
     def __getitem__(self, index):
         index = index % len(self.subset)
@@ -47,7 +53,7 @@ class SubDataset(Dataset):
         return x, y
 
     def __len__(self):
-        return len(self.subset)*64
+        return len(self.subset)*self.num_crops
 
 # add augmentations here
 data_transform = {'train':
