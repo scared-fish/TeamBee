@@ -19,7 +19,7 @@ batch_size = 64
 train_size = 5
 val_size = 1
 epochs = 10
-lr = 0.007
+lr = 0.001
 #weight_decay = 0.01
 #momentum = 0.9
 num_class = 8
@@ -58,6 +58,9 @@ def main():
     for (_, labels) in train_loader:
        h, _ = np.histogram(labels.flatten(), bins=num_class)
        weights += h
+    if np.any(~np.isfinite(weights)):
+        print("WARNING: Some labels not used in train set.")
+        weights[~np.isfinite(weights)] = 0.0
     weights /= weights.sum()
     weights = 1.0 / (num_class * weights)
     print("weigths:" + str(weights))

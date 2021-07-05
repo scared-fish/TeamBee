@@ -32,7 +32,7 @@ def save_img(outputs_list):
             output = color_map(output)
             label = color_map(label)
             label = np.squeeze(label)
-            original_image = (original_image + 1.0) / 2.0
+            #original_image = (original_image + 1.0) / 2.0
             original_image = color_map_gray(original_image[0])
 
             output = np.concatenate((output, original_image, label), axis=1)

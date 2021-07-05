@@ -11,7 +11,6 @@ def validate(model, num_class, val_loader, val_size, batch_size, device, output_
         for images, targets in val_loader:
             targets = targets.to(device)
             targets = targets.long()
-            print(targets.shape)
 
             outputs = model(images.to(device))
             _, y_pred = torch.max(outputs, dim=1)
