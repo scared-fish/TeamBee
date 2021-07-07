@@ -3,6 +3,7 @@ import torch
 from PIL import Image
 from torch.utils.data import Dataset
 from transforms import RandomCrop, RandomHorizontalFlip, RandomVerticalFlip, ToTensor, Compose
+from skimage.transform import rescale
 
 class BeecellsDataset(Dataset):
     """Bee cells dataset."""
@@ -23,6 +24,11 @@ class BeecellsDataset(Dataset):
             full_mask_path = self.mask_path+str(i)+'.png'
             img = np.array(Image.open(full_input_path).convert("RGB"), dtype=np.float32)[:, :, :1]/255
             mask = np.array(Image.open(full_mask_path).convert("RGB"), dtype=np.int32)[:, :, 0]
+            #print(img.shape)
+            #print(img)
+            #print("img:" + str(img) + "inf: " + str(np.isinf(img)))
+            #img=rescale(img,0.5)
+            #mask=rescale(mask,0.5,order=0)
             self.images.append((img,mask))
 
 

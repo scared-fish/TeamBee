@@ -18,14 +18,14 @@ load_model = False
 batch_size = 64
 train_size = 5
 val_size = 1
-epochs = 10
+epochs = 50
 lr = 0.001
 #weight_decay = 0.01
 #momentum = 0.9
 num_class = 8
 img_num = 6
 #small_img_num = 1200
-num_crops = 100
+num_crops = 200
 
 # SET DEVICE
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -58,12 +58,11 @@ def main():
     for (_, labels) in train_loader:
        h, _ = np.histogram(labels.flatten(), bins=num_class)
        weights += h
+    weights /= weights.sum()
+    weights = 1.0 / (num_class * weights)
     if np.any(~np.isfinite(weights)):
         print("WARNING: Some labels not used in train set.")
         weights[~np.isfinite(weights)] = 0.0
-    weights /= weights.sum()
-    weights = 1.0 / (num_class * weights)
-    print("weigths:" + str(weights))
     criterion = nn.CrossEntropyLoss(weight=torch.from_numpy(weights).to(device)).to(device)
 
     # LOAD TRAINED MODEL
@@ -78,35 +77,44 @@ def main():
     for epoch in tqdm.auto.tqdm(range(epochs)):
         # TRAINING
         #print(datetime.now())
-        loss_v = train(unet, epoch, optimizer, criterion, train_loader, epochs, device)
+        loss_tmp = train(unet, epoch, optimizer, criterion, train_loader, epochs, device)
         #print(datetime.now())
         
         # SAVE CHECKPOINT
-        torch.save(unet.state_dict(), './checkpoint/state_dict_model.pt')
+        torch.save(unet.state_dict(), './checkpoint/batch_300.pt')
 
         # VALIDATION
-        outputs, accuracy_v, dice_v = validate(unet, num_class, val_loader, val_size, batch_size, device, outputs)
+        outputs, accuracy_tmp, dice_tmp = validate(unet, num_class, val_loader, val_size, batch_size, device, outputs)
 
         # PLOT ARRAYS
-        np.append(loss, loss_v)
-        np.append(accuracy, accuracy_v)
-        np.append(dice, dice_v)
+        accuracy.append(accuracy_tmp)
+        dice.append(dice_tmp)
+        loss.append(loss_tmp)
 
     # SAVE
     save_img(outputs)
+    print('loss: {}\naccuracy: {}\ndice: {}'.format(loss, accuracy, dice))
+    loss = np.array(loss).astype(np.float)
+    accuracy = np.array(accuracy).astype(np.float)
+    dice = np.array(dice).astype(np.float)
 
-    # SHOW PLOT
-    fig, (ax1, ax2, ax3) = plt.subplots(1,3)
-    fig.suptitle('Plot to show statistics during Runtime')
-    ax1.plot(loss, range(epochs))
-    ax1.set_title('Loss per Epoch')
-    ax1.set(xlabel='Loss', ylabel='Epoch')
-    ax1.plot(loss, range(epochs))
-    ax1.set_title('Validation Accuracy per Epoch')
-    ax1.set(xlabel='Validation Accuracy', ylabel='Epoch')
-    ax1.plot(loss, range(epochs))
-    ax1.set_title('Dice-Coefficiency per Epoch')
-    ax1.set(xlabel='Dice-Coefficiency', ylabel='Epoch')
+    # SHOW PLOTS
+    t = np.arange(0, epochs, 1)
+
+    ax1 = plt.subplot(311)
+    plt.plot(t, loss)
+    plt.ylabel('Loss')
+    plt.setp(ax1.get_xticklabels(), visible=False)
+
+    ax2 = plt.subplot(312, sharex=ax1)
+    plt.plot(t, accuracy)
+    plt.ylabel('Accuracy')
+    plt.setp(ax2.get_xticklabels(), visible=False)
+
+    ax3 = plt.subplot(313, sharex=ax1)
+    plt.plot(t, dice)
+    plt.ylabel('Dice')
+    #plt.xlim(0.01, 5.0)
     plt.show()
 
 if __name__ == "__main__":

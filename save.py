@@ -27,7 +27,7 @@ def save_img(outputs_list):
         if batch_index > 1:
             break
         for sample_index, (output, label, original_image) in enumerate(zip(outputs, labels, original_images)):
-            if sample_index > 100:
+            if sample_index > 300:
                 break
             output = color_map(output)
             label = color_map(label)
@@ -37,17 +37,3 @@ def save_img(outputs_list):
 
             output = np.concatenate((output, original_image, label), axis=1)
             plt.imsave('./outputs/output' + str(batch_index) + "_" + str(sample_index) + '.png', output)
-
-    # SAVE OUTPUT IMAGES
-    #for i in range(len(outputs_list)):
-    #    outputs = outputs_list[i]
-    #    #print("outputs before color_map:"  str(outputs))
-    #    outputs_c = [color_map[i] for i in outputs.cpu()]
-    #    for j in range(len(outputs_c)):
-    #        output = outputs_c[j]/255
-    #        #print(output)
-    #        output = torch.from_numpy(output)
-    #        output = output.permute(2,0,1)
-    #        #print(output)
-    #        #print(output.dtype)
-    #        utils.save_image(output, './outputs/output'str(i)str(j)'.png')
