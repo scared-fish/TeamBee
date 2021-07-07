@@ -12,7 +12,6 @@ from torch.utils.data import DataLoader
 
 import tqdm.auto
 
-
 # HYPER-PARAMETERS
 load_model = False
 batch_size = 64
@@ -22,14 +21,14 @@ epochs = 32
 lr = 0.001
 num_class = 8
 img_num = 6
-num_crops = 100
-
-# SET DEVICE
-device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-print(device)
+num_crops = 1000
 # PATH
 mask_path = './imgs/masks/'
 input_path = './imgs/inputs/'
+
+# SET DEVICE
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+print('Available device: {}'.format(device))
 
 def main():
     # MODEL
@@ -52,7 +51,7 @@ def main():
 
     # Calculate class weights.
     weights = np.zeros(shape=(num_class,), dtype=np.float32)
-    for (_, labels) in train_data:
+    for (_, labels) in train_loader:
        h, _ = np.histogram(labels.flatten(), bins=num_class)
        weights += h
     ### Excluding empty labels
@@ -91,12 +90,12 @@ def main():
 
     # SAVE
     save_img(outputs)
+
+    # SHOW PLOTS
     print('loss: {}\naccuracy: {}\ndice: {}'.format(loss, accuracy, dice))
     loss = np.array(loss).astype(np.float)
     accuracy = np.array(accuracy).astype(np.float)
     dice = np.array(dice).astype(np.float)
-
-    # SHOW PLOTS
     t = np.arange(0, epochs, 1)
 
     ax1 = plt.subplot(311)
@@ -112,7 +111,6 @@ def main():
     ax3 = plt.subplot(313, sharex=ax1)
     plt.plot(t, dice)
     plt.ylabel('Dice')
-#    plt.xlim(0.01, 5.0)
 
     plt.show()
 
