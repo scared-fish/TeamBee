@@ -70,49 +70,57 @@ def main():
         unet.load_state_dict(torch.load('./checkpoint/state_dict_model.pt'))
 
     outputs = []
-    loss = []
+    training_loss = []
+    validation_loss = []
     accuracy = []
     dice = []
 
     for epoch in tqdm.auto.tqdm(range(epochs)):
         # TRAINING
         #print(datetime.now())
-        loss_tmp = train(unet, epoch, optimizer, criterion, train_loader, epochs, device)
+        tloss_tmp = train(unet, epoch, optimizer, criterion, train_loader, epochs, device)
         #print(datetime.now())
         
         # SAVE CHECKPOINT
         torch.save(unet.state_dict(), './checkpoint/batch_300.pt')
 
         # VALIDATION
-        outputs, accuracy_tmp, dice_tmp = validate(unet, num_class, val_loader, val_size, batch_size, device, outputs)
+        outputs, accuracy_tmp, dice_tmp, vloss_tmp = validate(unet, num_class, val_loader, val_size, batch_size, device, outputs, criterion)
 
         # PLOT ARRAYS
         accuracy.append(accuracy_tmp)
         dice.append(dice_tmp)
-        loss.append(loss_tmp)
+        training_loss.append(tloss_tmp)
+        validation_loss.append(vloss_tmp)
 
     # SAVE
     save_img(outputs)
-    print('loss: {}\naccuracy: {}\ndice: {}'.format(loss, accuracy, dice))
-    loss = np.array(loss).astype(np.float)
+    print('loss: {}\naccuracy: {}\ndice: {}'.format(training_loss, accuracy, dice))
+    training_loss = np.array(training_loss).astype(np.float)
+    validation_loss = np.array(validation_loss).astype(np.float)
     accuracy = np.array(accuracy).astype(np.float)
     dice = np.array(dice).astype(np.float)
 
     # SHOW PLOTS
-    t = np.arange(0, epochs, 1)
+    t = np.arange(1, epochs+1, 1)
 
     ax1 = plt.subplot(311)
-    plt.plot(t, loss)
-    plt.ylabel('Loss')
+    plt.plot(t, training_loss)
+    plt.plot(t, validation_loss)
+    plt.xlabel('epochs')
+    plt.ylabel('loss')
     plt.setp(ax1.get_xticklabels(), visible=False)
+    plt.title('Training vs Validation Loss')
 
     ax2 = plt.subplot(312, sharex=ax1)
     plt.plot(t, accuracy)
+    plt.xlabel('epochs')
     plt.ylabel('Accuracy')
     plt.setp(ax2.get_xticklabels(), visible=False)
 
     ax3 = plt.subplot(313, sharex=ax1)
     plt.plot(t, dice)
+    plt.xlabel('epochs')
     plt.ylabel('Dice')
     #plt.xlim(0.01, 5.0)
     plt.show()
