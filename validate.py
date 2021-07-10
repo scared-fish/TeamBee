@@ -15,11 +15,13 @@ def validate(model, num_class, val_loader, val_size, batch_size, device, output_
 
             outputs = model(images.to(device))
 
+            # LOSS
+            loss += criterion(outputs, targets)
+
             _, y_pred = torch.max(outputs, dim=1)
             output_list.append((y_pred.cpu().numpy(), targets.cpu().numpy(), images.cpu().numpy()))
 
-            # LOSS
-            loss += criterion(outputs, targets)
+
             # ACCURACY
             acc += multi_acc(y_pred, targets)
             # ONE-HOT ENCODING
