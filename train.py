@@ -18,7 +18,6 @@ def train(model, epoch, optimizer, criterion, train_loader, epochs, device):
         loss.backward()
         optimizer.step()
 
-    print('Epoch [{}/{}], training loss: {:.4f}'.format(
-            epoch + 1, epochs, loss.item()))
-
+    print('Epoch [{}/{}], training loss: {:.4f}'.format(epoch + 1, epochs, loss.item()))
+    
     return '{:.2f}'.format(loss.item())

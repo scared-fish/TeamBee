@@ -10,7 +10,7 @@ def save_img(outputs_list):
         if batch_index > 1:
             break
         for sample_index, (output, label, original_image) in enumerate(zip(outputs, labels, original_images)):
-            if sample_index > 300:
+            if sample_index > 500:
                 break
             output = color_map(output)
             label = color_map(label)

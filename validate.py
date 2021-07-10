@@ -26,6 +26,7 @@ def validate(model, num_class, val_loader, val_size, batch_size, device, output_
 
         print('Validation Accuracy: {:.3f} %'.format(acc/(val_size/batch_size)))
         print('Validation Dice-Coefficient: {:.3f}'.format(dice))
+        print('Accuracy: {:.3f}'.format(acc))
         print('=' * 60)
 
     return output_list, '{:.1f}'.format(acc/(val_size/batch_size)), '{:.2f}'.format(dice)
