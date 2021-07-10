@@ -25,9 +25,9 @@ class BeecellsDataset(Dataset):
             full_mask_path = self.mask_path+str(i)+'.png'
             img = np.array(Image.open(full_input_path).convert("RGB"), dtype=np.float32)[:, :, 0]/255
             mask = np.array(Image.open(full_mask_path).convert("RGB"), dtype=np.int32)[:, :, 0]
-            img = rescale(img,0.5,order=1)
-            img = img[:, :, None]
-            mask = mask[::2, ::2]
+            #img = rescale(img,0.5,order=1)
+            #img = img[:, :, None]
+            #mask = mask[::2, ::2]
             self.images.append((img,mask))
 
 
