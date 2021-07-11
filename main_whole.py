@@ -98,14 +98,15 @@ def main():
         loss.append(loss_tmp)
 
         # SAVE
-        if whole_set & (epoch % 50) == 0:
-            save_img_whole(outputs)
-        else:
-            save_img(outputs)
+        if (epoch % 50) == 0:
+            if whole_set:
+                save_img_whole(outputs,epoch)
+            else:
+                save_img(outputs)
 
     # SAVE
     if whole_set:
-        save_img_whole(outputs)
+        save_img_whole(outputs,'final')
     else:
         save_img(outputs)
     
@@ -131,6 +132,7 @@ def main():
     plt.plot(t, dice)
     plt.ylabel('Dice')
     #plt.xlim(0.01, 5.0)
+    plt.savefig('./outputs/plot-'+str(batch_size)+'-'+str(epochs)+'-'+str(num_crops)+'.png')
     plt.show()
 
 if __name__ == "__main__":

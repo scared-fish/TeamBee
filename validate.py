@@ -8,6 +8,7 @@ def validate(model, num_class, val_loader, val_size, batch_size, device, output_
 
     with torch.no_grad():
         acc = 0
+        output_list = []
         for images, targets in val_loader:
             targets = targets.to(device)
             targets = targets.long()
@@ -23,9 +24,9 @@ def validate(model, num_class, val_loader, val_size, batch_size, device, output_
             y_pred = torch.nn.functional.one_hot(y_pred, num_class)
             # DICE COEFFICIENT
             dice = dice_coefficient(y_pred, targets)
-
-        print('Validation Accuracy: {:.3f} %'.format(acc/(val_size/batch_size)))
+        acc = acc/len(val_loader)
+        print('Validation Accuracy: {:.3f} %'.format(acc))
         print('Validation Dice-Coefficient: {:.3f}'.format(dice))
         print('=' * 100)
 
-    return output_list, '{:.1f}'.format(acc/(val_size/batch_size)), '{:.2f}'.format(dice)
+    return output_list, '{:.1f}'.format(acc), '{:.2f}'.format(dice)
