@@ -26,7 +26,7 @@ lr = 0.001
 num_class = 8
 img_num = 6
 #small_img_num = 1200
-num_crops = 200
+num_crops = 500
 whole_set = True
 size_img = (3000,4000)
 size_crops = (100,100)
@@ -90,7 +90,7 @@ def main():
         torch.save(unet.state_dict(), './checkpoint/num_crops200.pt')
 
         # VALIDATION
-        outputs, accuracy_tmp, dice_tmp = validate(unet, num_class, val_loader, val_size, batch_size, device, outputs)
+        outputs, accuracy_tmp, dice_tmp = validate(unet, num_class, val_loader, device, outputs)
 
         # PLOT ARRAYS
         accuracy.append(accuracy_tmp)
@@ -98,7 +98,7 @@ def main():
         loss.append(loss_tmp)
 
         # SAVE
-        if (epoch % 50) == 0:
+        if (epoch % 50) == 0 or epoch in range(5):
             if whole_set:
                 save_img_whole(outputs,epoch)
             else:

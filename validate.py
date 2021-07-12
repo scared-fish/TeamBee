@@ -1,8 +1,7 @@
 import torch
 from evaluation import multi_acc, dice_coefficient
-from data import data_transform
 
-def validate(model, num_class, val_loader, val_size, batch_size, device, output_list):
+def validate(model, num_class, val_loader, device, output_list):
 
     model.eval()
 

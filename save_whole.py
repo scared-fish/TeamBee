@@ -32,7 +32,7 @@ def save_img_whole(outputs_list, epoch):
         for sample_index, (output, label, original_image) in enumerate(zip(outputs, labels, original_images)):
             #if sample_index > 300:
             #    break
-            #output = color_map(output)
+            output = color_map(output)
             label = color_map(label)
             label = np.squeeze(label)
             original_image = color_map_gray(original_image[0])
