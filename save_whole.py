@@ -46,10 +46,11 @@ def save_img_whole(outputs_list, epoch):
     pred_list= []
     label_list= []
     img_list= []
-    for i in range(30):
-        pred_list.append(np.concatenate(tuple(predictions_whole[(i*40):(i*40)+40]),axis=1))
-        label_list.append(np.concatenate(tuple(labels_whole[(i*40):(i*40)+40]),axis=1))
-        img_list.append(np.concatenate(tuple(images_whole[(i*40):(i*40)+40]),axis=1))
+    print(len(predictions_whole))
+    for i in range(15):
+        pred_list.append(np.concatenate(tuple(predictions_whole[(i*20):(i*20)+20]),axis=1))
+        label_list.append(np.concatenate(tuple(labels_whole[(i*20):(i*20)+20]),axis=1))
+        img_list.append(np.concatenate(tuple(images_whole[(i*20):(i*20)+20]),axis=1))
     predictions_whole = np.concatenate(tuple(pred_list),axis=0)
     if epoch == 0:
         labels_whole = np.concatenate(tuple(label_list),axis=0)

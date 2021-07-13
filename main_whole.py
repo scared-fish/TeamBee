@@ -10,6 +10,7 @@ import torch
 from torch import nn
 import torch.optim as optim
 from torch.utils.data import DataLoader
+import math
 
 import tqdm.auto
 
@@ -19,16 +20,13 @@ load_model = False
 batch_size = 64
 train_size = 5
 val_size = 1
-epochs = 500
+epochs = 50
 lr = 0.001
-#weight_decay = 0.01
-#momentum = 0.9
 num_class = 8
 img_num = 6
-#small_img_num = 1200
 num_crops = 500
 whole_set = True
-size_img = (3000,4000)
+size_img = (1500,2000)
 size_crops = (100,100)
 
 # SET DEVICE
@@ -98,7 +96,7 @@ def main():
         loss.append(loss_tmp)
 
         # SAVE
-        if (epoch % 50) == 0 or epoch in range(5):
+        if (epoch % (math.floor(epochs/10))) == 0 or epoch in range(5):
             if whole_set:
                 save_img_whole(outputs,epoch)
             else:
