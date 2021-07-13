@@ -1,3 +1,4 @@
+import math
 from model import UNet
 from data import BeecellsDataset, SubDataset, WholeImageDataset, data_transform
 from train import train
@@ -12,17 +13,17 @@ from torch.utils.data import DataLoader
 import tqdm.auto
 
 # HYPER-PARAMETERS
-load_model = True
-batch_size = 50
+load_model = False
+batch_size = 64
 train_size = 5
 val_size = 1
 epochs = 60
-lr = 0.002
+lr = 0.001
 num_class = 8
 img_num = 6
-num_crops = 300
+num_crops = 400
 whole_image_output = True
-size_img = (3000,4000)
+size_img = (1500,2000)
 size_crops = (100,100)
 # PATH
 mask_path = './imgs/masks/'
@@ -94,10 +95,11 @@ def main():
         validation_loss.append(vloss_tmp)
 
         # SAVE IMAGES
-        if whole_image_output and (epoch in range(5) or (epoch % 50) == 0 or epoch == epochs - 1):    # Epoch [1, 2, 3, 4, 5, n mod 50, epochs] are printed
-            save_img_whole(outputs, epoch)
-        else:
-            save_img(outputs)
+        if (epoch in range(5) or (epoch % (math.floor(epochs/10))) == 0 or epoch == epochs - 1): # Epoch [1, 2, 3, 4, 5, n mod 50, epochs] are printed
+            if whole_image_output:    
+                save_img_whole(outputs, epoch)
+            else:
+                save_img(outputs)
     # SAVE
     #save_img(outputs)
 

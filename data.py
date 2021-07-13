@@ -3,6 +3,7 @@ import torch
 from PIL import Image
 from torch.utils.data import Dataset
 from transforms import RandomCrop, RandomHorizontalFlip, RandomVerticalFlip, ToTensor, Compose, Sequential_Crop
+from skimage.transform import rescale
 import math
 
 class BeecellsDataset(Dataset):
@@ -21,8 +22,11 @@ class BeecellsDataset(Dataset):
         for i in range(img_num):
             full_input_path = self.input_path+str(i)+'.png'
             full_mask_path = self.mask_path+str(i)+'.png'
-            img = np.array(Image.open(full_input_path).convert("RGB"), dtype=np.float32)[:, :, :0]/255 #[:, :, :1]/255
+            img = np.array(Image.open(full_input_path).convert("RGB"), dtype=np.float32)[:, :, 0]/255 #[:, :, :1]/255
             mask = np.array(Image.open(full_mask_path).convert("RGB"), dtype=np.int32)[:, :, 0]
+            img = rescale(img,0.5,order=1)
+            img = img[:, :, None]
+            mask = mask[::2, ::2]
             self.images.append((img,mask))
 
     def __len__(self):

@@ -8,6 +8,7 @@ def validate(model, num_class, val_loader, device, output_list, criterion):
     with torch.no_grad():
         loss = 0
         acc = 0
+        output_list = []
         for images, targets in val_loader:
             targets = targets.to(device)
             targets = targets.long()
