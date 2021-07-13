@@ -10,14 +10,15 @@ from torch import nn
 import torch.optim as optim
 from torch.utils.data import DataLoader
 import tqdm.auto
+import math
 
 # HYPER-PARAMETERS
-load_model = True
-batch_size = 50
+load_model = False
+batch_size = 64
 train_size = 5
 val_size = 1
-epochs = 60
-lr = 0.002
+epochs = 54
+lr = 0.001
 num_class = 8
 img_num = 6
 num_crops = 300
@@ -45,7 +46,6 @@ def main():
         val_set = WholeImageDataset(val_data, size_img, size_crops, transform=data_transform['val_whole_img'])
     else:
         val_set = SubDataset(val_data, num_crops, transform=data_transform['val'])
-
     train_loader = DataLoader(dataset=train_set,
                               batch_size=batch_size,
                               shuffle=True)
@@ -74,13 +74,15 @@ def main():
     outputs = []
     training_loss = []
     validation_loss = []
+    taccuracy = []
     accuracy = []
+    tdice = []
     dice = []
 
     for epoch in tqdm.auto.tqdm(range(epochs)):
         # TRAINING
-        tloss_tmp = train(unet, epoch, optimizer, criterion, train_loader, epochs, device)
-        
+        train_outputs, tloss_tmp, tacc_tmp, tdice_tmp = train(unet, num_class, epoch, optimizer, criterion, train_loader, epochs, device)
+
         # SAVE CHECKPOINT
         torch.save(unet.state_dict(), './checkpoint/state_dict_model.pt')
 
@@ -88,18 +90,20 @@ def main():
         outputs, vloss_tmp, accuracy_tmp, dice_tmp = validate(unet, num_class, val_loader, device, outputs, criterion)
 
         # PLOT ARRAYS
-        accuracy.append(accuracy_tmp)
-        dice.append(dice_tmp)
         training_loss.append(tloss_tmp)
         validation_loss.append(vloss_tmp)
+        taccuracy.append(tacc_tmp)
+        accuracy.append(accuracy_tmp)
+        tdice.append(tdice_tmp)
+        dice.append(dice_tmp)
+
 
         # SAVE IMAGES
-        if whole_image_output and (epoch in range(5) or (epoch % 50) == 0 or epoch == epochs - 1):    # Epoch [1, 2, 3, 4, 5, n mod 50, epochs] are printed
+        if whole_image_output and (epoch in range(6) or (epoch % math.floor(epochs / 10)) == 0 or epoch == epochs - 1):    # Epoch [1, 2, 3, 4, 5, n mod 50, epochs] are printed
             save_img_whole(outputs, epoch)
-        else:
+            save_img(train_outputs, epoch)
+        elif not whole_image_output:
             save_img(outputs)
-    # SAVE
-    #save_img(outputs)
 
     # SHOW PLOTS
     print('training_loss: {}\naccuracy: {}\ndice: {}\nvalidation_loss: {}'.format(training_loss, accuracy, dice, validation_loss))
@@ -114,15 +118,17 @@ def main():
     plt.plot(t, validation_loss)
     plt.ylabel('Loss')
     plt.setp(ax1.get_xticklabels(), visible=False)
-    plt.title('Training vs Validation Loss')
+    plt.title('Training(orange) vs Validation(blue)')
 
     ax2 = plt.subplot(312, sharex=ax1)
     plt.plot(t, accuracy)
+    plt.plot(t, taccuracy)
     plt.ylabel('Accuracy')
     plt.setp(ax2.get_xticklabels(), visible=False)
 
     ax3 = plt.subplot(313, sharex=ax1)
     plt.plot(t, dice)
+    plt.plot(t, tdice)
     plt.ylabel('Dice')
     
     plt.savefig('./outputs/plot-'+str(batch_size)+'-'+str(epochs)+'-'+str(num_crops)+'.png')

@@ -4,11 +4,11 @@ from matplotlib import pyplot as plt
 color_map = plt.get_cmap("Set2", lut=9)
 color_map_gray = plt.get_cmap("gray")
 
-def save_img(outputs_list):
+def save_img(outputs_list, epoch):
 
     for batch_index, (outputs, labels, original_images) in enumerate(outputs_list):
-        if batch_index > 1:
-            break
+        #if batch_index > 1:
+        #    break
         for sample_index, (output, label, original_image) in enumerate(zip(outputs, labels, original_images)):
             if sample_index > 500:
                 break
@@ -19,7 +19,7 @@ def save_img(outputs_list):
             original_image = color_map_gray(original_image[0])
 
             output = np.concatenate((output, original_image, label), axis=1)
-            plt.imsave('./outputs/output' + str(batch_index) + "_" + str(sample_index) + '.png', output)
+            plt.imsave('./outputs/train-epoch-' + str(epoch) + "-" + str(batch_index) + "-" + str(sample_index) + '.png', output)
 
 def save_img_whole(outputs_list, epoch):
     predictions_whole = []
