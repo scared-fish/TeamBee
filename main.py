@@ -1,27 +1,29 @@
 from model import UNet
-from data import BeecellsDataset, SubDataset,  data_transform
+from data import BeecellsDataset, SubDataset, WholeImageDataset, data_transform
 from train import train
 from validate import validate
-from save import save_img
+from save import save_img, save_img_whole
 import matplotlib.pyplot as plt
 import numpy as np
 import torch
 from torch import nn
 import torch.optim as optim
 from torch.utils.data import DataLoader
-
 import tqdm.auto
 
 # HYPER-PARAMETERS
-load_model = False
-batch_size = 64
+load_model = True
+batch_size = 50
 train_size = 5
 val_size = 1
-epochs = 32
-lr = 0.001
+epochs = 60
+lr = 0.002
 num_class = 8
 img_num = 6
-num_crops = 1000
+num_crops = 300
+whole_image_output = True
+size_img = (3000,4000)
+size_crops = (100,100)
 # PATH
 mask_path = './imgs/masks/'
 input_path = './imgs/inputs/'
@@ -38,9 +40,11 @@ def main():
     # DATA_LOADER
     dataset = BeecellsDataset(img_num, input_path='./imgs/inputs/', mask_path='./imgs/masks/')
     train_data, val_data = torch.utils.data.random_split(dataset, [train_size, val_size])
-
     train_set = SubDataset(train_data, num_crops, transform=data_transform['train'])
-    val_set = SubDataset(val_data, num_crops, transform=data_transform['val'])
+    if whole_image_output:
+        val_set = WholeImageDataset(val_data, size_img, size_crops, transform=data_transform['val_whole_img'])
+    else:
+        val_set = SubDataset(val_data, num_crops, transform=data_transform['val'])
 
     train_loader = DataLoader(dataset=train_set,
                               batch_size=batch_size,
@@ -51,57 +55,66 @@ def main():
 
     # Calculate class weights.
     weights = np.zeros(shape=(num_class,), dtype=np.float32)
-    print("0-weigths:" + str(weights))
     for (_, labels) in train_loader:
        h, _ = np.histogram(labels.flatten(), bins=num_class)
        weights += h
     weights /= weights.sum()
     weights = 1.0 / (num_class * weights)
-    ### Excluding empty labels
     if np.any(~np.isfinite(weights)):
         print("WARNING: Some labels not used in train set.")
         weights[~np.isfinite(weights)] = 0.0
-    print("1-weigths:" + str(weights))
+    print("Initial-weigths:" + str(weights))
     criterion = nn.CrossEntropyLoss(weight=torch.from_numpy(weights).to(device)).to(device)
 
     # LOAD TRAINED MODEL
     if load_model:
+        print('Using checkpoint and loading saved state_dict')
         unet.load_state_dict(torch.load('./checkpoint/state_dict_model.pt'))
 
     outputs = []
-    loss = []
+    training_loss = []
+    validation_loss = []
     accuracy = []
     dice = []
 
     for epoch in tqdm.auto.tqdm(range(epochs)):
         # TRAINING
-        loss_tmp = train(unet, epoch, optimizer, criterion, train_loader, epochs, device)
+        tloss_tmp = train(unet, epoch, optimizer, criterion, train_loader, epochs, device)
         
         # SAVE CHECKPOINT
         torch.save(unet.state_dict(), './checkpoint/state_dict_model.pt')
 
         # VALIDATION
-        outputs, accuracy_tmp, dice_tmp = validate(unet, num_class, val_loader, val_size, batch_size, device, outputs)
+        outputs, vloss_tmp, accuracy_tmp, dice_tmp = validate(unet, num_class, val_loader, device, outputs, criterion)
 
-        # PLOT PREPARE ARRAYS
+        # PLOT ARRAYS
         accuracy.append(accuracy_tmp)
         dice.append(dice_tmp)
-        loss.append(loss_tmp)
+        training_loss.append(tloss_tmp)
+        validation_loss.append(vloss_tmp)
 
+        # SAVE IMAGES
+        if whole_image_output and (epoch in range(5) or (epoch % 50) == 0 or epoch == epochs - 1):    # Epoch [1, 2, 3, 4, 5, n mod 50, epochs] are printed
+            save_img_whole(outputs, epoch)
+        else:
+            save_img(outputs)
     # SAVE
-    save_img(outputs)
+    #save_img(outputs)
 
     # SHOW PLOTS
-    print('loss: {}\naccuracy: {}\ndice: {}'.format(loss, accuracy, dice))
-    loss = np.array(loss).astype(np.float)
+    print('training_loss: {}\naccuracy: {}\ndice: {}\nvalidation_loss: {}'.format(training_loss, accuracy, dice, validation_loss))
+    training_loss = np.array(training_loss).astype(np.float)
+    validation_loss = np.array(validation_loss).astype(np.float)
     accuracy = np.array(accuracy).astype(np.float)
     dice = np.array(dice).astype(np.float)
     t = np.arange(0, epochs, 1)
 
     ax1 = plt.subplot(311)
-    plt.plot(t, loss)
+    plt.plot(t, training_loss)
+    plt.plot(t, validation_loss)
     plt.ylabel('Loss')
     plt.setp(ax1.get_xticklabels(), visible=False)
+    plt.title('Training vs Validation Loss')
 
     ax2 = plt.subplot(312, sharex=ax1)
     plt.plot(t, accuracy)
@@ -111,7 +124,8 @@ def main():
     ax3 = plt.subplot(313, sharex=ax1)
     plt.plot(t, dice)
     plt.ylabel('Dice')
-
+    
+    plt.savefig('./outputs/plot-'+str(batch_size)+'-'+str(epochs)+'-'+str(num_crops)+'.png')
     plt.show()
 
 if __name__ == "__main__":
