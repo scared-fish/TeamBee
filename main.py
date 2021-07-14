@@ -57,17 +57,18 @@ def main():
                             shuffle=False)
 
     # Calculate class weights.
-    weights = np.zeros(shape=(num_class,), dtype=np.float32)
-    for (_, labels) in train_loader:
-       h, _ = np.histogram(labels.flatten(), bins=num_class)
-       weights += h
-    weights /= weights.sum()
-    weights = 1.0 / (num_class * weights)
-    if np.any(~np.isfinite(weights)):
-        print("WARNING: Some labels not used in train set.")
-        weights[~np.isfinite(weights)] = 0.0
-    print("Initial-weigths:" + str(weights))
-    criterion = nn.CrossEntropyLoss(weight=torch.from_numpy(weights).to(device)).to(device)
+    # weights = np.zeros(shape=(num_class,), dtype=np.float32)
+    # for (_, labels) in train_loader:
+    #    h, _ = np.histogram(labels.flatten(), bins=num_class)
+    #    weights += h
+    # weights /= weights.sum()
+    # weights = 1.0 / (num_class * weights)
+    # if np.any(~np.isfinite(weights)):
+    #     print("WARNING: Some labels not used in train set.")
+    #     weights[~np.isfinite(weights)] = 0.0
+    # print("Initial-weigths:" + str(weights))
+    # criterion = nn.CrossEntropyLoss(weight=torch.from_numpy(weights).to(device)).to(device)
+    criterion = nn.CrossEntropyLoss().to(device)
 
     # LOAD TRAINED MODEL
     if load_model:
