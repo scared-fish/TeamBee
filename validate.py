@@ -6,10 +6,9 @@ def validate(model, num_class, val_loader, device, output_list, criterion):
     model.eval()
 
     with torch.no_grad():
-        loss = 0
-        acc = 0
+        loss, acc, dice = 0, 0, 0
         output_list = []
-        acc_list = []
+
         for images, targets in val_loader:
             targets = targets.to(device)
             targets = targets.long()
@@ -21,18 +20,16 @@ def validate(model, num_class, val_loader, device, output_list, criterion):
             # LOSS
             loss += criterion(outputs, targets.squeeze(1))
             # ACCURACY
-            acc_list.append(acc)
             acc += multi_acc(y_pred, targets)
             # ONE-HOT ENCODING
             targets = torch.nn.functional.one_hot(targets, num_class)
             y_pred = torch.nn.functional.one_hot(y_pred, num_class)
             # DICE COEFFICIENT
-            dice = dice_coefficient(y_pred, targets)
+            dice += dice_coefficient(y_pred, targets)
 
         val_loss = loss / len(val_loader)
         acc = acc/len(val_loader)
-        #print(len(val_loader))
-        #print('All accuracies: {}'.format(acc_list))
+        dice = dice/len(val_loader)
         print('Validation loss: {:.3f}'.format(val_loss))
         print('Validation Accuracy: {:.3f}'.format(acc))
         print('Validation Dice-Coefficient: {:.3f}'.format(dice))

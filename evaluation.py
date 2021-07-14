@@ -3,7 +3,6 @@ import torch
 def multi_acc(pred, label):
     corrects = (pred == label).float()
     acc = corrects.sum() / corrects.numel()
-    acc = acc
     return acc
 
 def dice_coefficient(pred, target, eps=1e-6):
