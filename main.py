@@ -13,15 +13,15 @@ import tqdm.auto
 import math
 
 # HYPER-PARAMETERS
-load_model = False
-batch_size = 64
+load_model = True
+batch_size = 70
 train_size = 5
 val_size = 1
-epochs = 54
-lr = 0.001
+epochs = 200
+lr = 0.002
 num_class = 8
 img_num = 6
-num_crops = 300
+num_crops = 350
 whole_image_output = True
 size_img = (3000,4000)
 size_crops = (100,100)
@@ -54,17 +54,17 @@ def main():
                             shuffle=False)
 
     # Calculate class weights.
-    weights = np.zeros(shape=(num_class,), dtype=np.float32)
-    for (_, labels) in train_loader:
-       h, _ = np.histogram(labels.flatten(), bins=num_class)
-       weights += h
-    weights /= weights.sum()
-    weights = 1.0 / (num_class * weights)
-    if np.any(~np.isfinite(weights)):
-        print("WARNING: Some labels not used in train set.")
-        weights[~np.isfinite(weights)] = 0.0
-    print("Initial-weigths:" + str(weights))
-    criterion = nn.CrossEntropyLoss(weight=torch.from_numpy(weights).to(device)).to(device)
+#    weights = np.zeros(shape=(num_class,), dtype=np.float32)
+#    for (_, labels) in train_loader:
+#       h, _ = np.histogram(labels.flatten(), bins=num_class)
+#       weights += h
+#    weights /= weights.sum()
+#    weights = 1.0 / (num_class * weights)
+#    if np.any(~np.isfinite(weights)):
+#        print("WARNING: Some labels not used in train set.")
+#        weights[~np.isfinite(weights)] = 0.0
+#    print("Initial-weigths:" + str(weights))
+    criterion = nn.CrossEntropyLoss()#weight=torch.from_numpy(weights).to(device)).to(device
 
     # LOAD TRAINED MODEL
     if load_model:
@@ -99,7 +99,7 @@ def main():
 
 
         # SAVE IMAGES
-        if whole_image_output and (epoch in range(6) or (epoch % math.floor(epochs / 10)) == 0 or epoch == epochs - 1):    # Epoch [1, 2, 3, 4, 5, n mod 50, epochs] are printed
+        if whole_image_output and (epoch % 2 == 0) or (epoch == epochs - 1):    # Epoch [1, 2, 3, 4, 5, n mod 50, epochs] are printed
             save_img_whole(outputs, epoch)
             save_img(train_outputs, epoch)
         elif not whole_image_output:

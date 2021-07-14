@@ -10,7 +10,7 @@ def save_img(outputs_list, epoch):
         #if batch_index > 1:
         #    break
         for sample_index, (output, label, original_image) in enumerate(zip(outputs, labels, original_images)):
-            if sample_index > 500:
+            if sample_index > 10:
                 break
             output = color_map(output)
             label = color_map(label)
@@ -19,7 +19,7 @@ def save_img(outputs_list, epoch):
             original_image = color_map_gray(original_image[0])
 
             output = np.concatenate((output, original_image, label), axis=1)
-            plt.imsave('./outputs/train-epoch-' + str(epoch) + "-" + str(batch_index) + "-" + str(sample_index) + '.png', output)
+            plt.imsave('./outputs/image_train_snippets/train-' + str(epoch) + "-" + str(batch_index) + "-" + str(sample_index) + '.png', output)
 
 def save_img_whole(outputs_list, epoch):
     predictions_whole = []
@@ -54,7 +54,7 @@ def save_img_whole(outputs_list, epoch):
     if epoch == 0:
         labels_whole = np.concatenate(tuple(label_list),axis=0)
         images_whole = np.concatenate(tuple(img_list),axis=0)
-        plt.imsave('./outputs/labels_whole.png', labels_whole)
-        plt.imsave('./outputs/images_whole.png', images_whole)
+        plt.imsave('./outputs/whole_images/labels_whole.png', labels_whole)
+        plt.imsave('./outputs/whole_images/images_whole.png', images_whole)
     else:
-        plt.imsave('./outputs/predictions_whole' + str(epoch) + '.png', predictions_whole)
+        plt.imsave('./outputs/whole_images/predictions_whole' + str(epoch) + '.png', predictions_whole)

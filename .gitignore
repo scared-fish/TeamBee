@@ -1,0 +1,6 @@
+# Ignore user related files
+.idea/
+__pychache__/
+checkpoint/
+imgs/
+outputs/
