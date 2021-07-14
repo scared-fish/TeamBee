@@ -2,7 +2,7 @@ import numpy as np
 import torch
 from PIL import Image
 from torch.utils.data import Dataset
-from transforms import RandomCrop, RandomHorizontalFlip, RandomVerticalFlip, ToTensor, Compose, Sequential_Crop
+from transforms import RandomCrop, RandomCrop_central, RandomHorizontalFlip, RandomVerticalFlip, ToTensor, Compose, Sequential_Crop
 import math
 
 class BeecellsDataset(Dataset):
@@ -78,6 +78,13 @@ data_transform = {'train':
                         RandomCrop(100),
                         RandomHorizontalFlip(0.5),
                         RandomVerticalFlip(0.5)
+                    ]),
+                  'train_addition':
+                    Compose([
+                          ToTensor(),
+                          RandomCrop_central(100),
+                          RandomHorizontalFlip(0.5),
+                          RandomVerticalFlip(0.5)
                     ]),
                   'val_whole_img':
                     Compose([

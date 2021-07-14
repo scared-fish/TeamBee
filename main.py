@@ -8,7 +8,7 @@ import numpy as np
 import torch
 from torch import nn
 import torch.optim as optim
-from torch.utils.data import DataLoader
+from torch.utils.data import DataLoader, ConcatDataset
 import tqdm.auto
 import math
 
@@ -21,7 +21,8 @@ epochs = 54
 lr = 0.001
 num_class = 8
 img_num = 6
-num_crops = 300
+num_crops = 200
+num_crops_addition = 200
 whole_image_output = True
 size_img = (3000,4000)
 size_crops = (100,100)
@@ -42,11 +43,13 @@ def main():
     dataset = BeecellsDataset(img_num, input_path='./imgs/inputs/', mask_path='./imgs/masks/')
     train_data, val_data = torch.utils.data.random_split(dataset, [train_size, val_size])
     train_set = SubDataset(train_data, num_crops, transform=data_transform['train'])
+    train_set_addition = SubDataset(train_data, num_crops_addition, transform=data_transform['train_addition'])
+    train_set_total = ConcatDataset([train_set, train_set_addition])
     if whole_image_output:
         val_set = WholeImageDataset(val_data, size_img, size_crops, transform=data_transform['val_whole_img'])
     else:
         val_set = SubDataset(val_data, num_crops, transform=data_transform['val'])
-    train_loader = DataLoader(dataset=train_set,
+    train_loader = DataLoader(dataset=train_set_total,
                               batch_size=batch_size,
                               shuffle=True)
     val_loader = DataLoader(dataset=val_set,
