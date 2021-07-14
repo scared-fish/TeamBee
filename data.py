@@ -22,11 +22,11 @@ class BeecellsDataset(Dataset):
         for i in range(img_num):
             full_input_path = self.input_path+str(i)+'.png'
             full_mask_path = self.mask_path+str(i)+'.png'
-            img = np.array(Image.open(full_input_path).convert("RGB"), dtype=np.float32)[:, :, 0]/255 #[:, :, :1]/255
+            img = np.array(Image.open(full_input_path).convert("RGB"), dtype=np.float32)[:, :, :1]/255 #[:, :, :1]/255
             mask = np.array(Image.open(full_mask_path).convert("RGB"), dtype=np.int32)[:, :, 0]
-            img = rescale(img,0.5,order=1)
-            img = img[:, :, None]
-            mask = mask[::2, ::2]
+            #img = rescale(img,0.5,order=1)
+            #img = img[:, :, None]
+            #mask = mask[::2, ::2]
             self.images.append((img,mask))
 
     def __len__(self):
@@ -56,7 +56,7 @@ class SubDataset(Dataset):
         return len(self.subset)*self.num_crops
 
 class WholeImageDataset(Dataset):
-    def __init__(self, subset, size_img=(3000,4000), size_crops=(100,100),transform=None):
+    def __init__(self, subset, size_img=(3000,4000), size_crops=(200,200),transform=None):
         self.subset = subset
         self.transform = transform
         self.size_img = size_img
@@ -79,7 +79,7 @@ class WholeImageDataset(Dataset):
 data_transform = {'train':
                     Compose([
                         ToTensor(),
-                        RandomCrop(100),
+                        RandomCrop(200),
                         RandomHorizontalFlip(0.5),
                         RandomVerticalFlip(0.5)
                     ]),
@@ -91,5 +91,5 @@ data_transform = {'train':
                   'val':
                     Compose([
                         ToTensor(),
-                        RandomCrop(100)
+                        RandomCrop(200)
                     ])}

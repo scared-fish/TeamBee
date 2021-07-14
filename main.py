@@ -14,17 +14,17 @@ import tqdm.auto
 
 # HYPER-PARAMETERS
 load_model = False
-batch_size = 64
+batch_size = 16
 train_size = 5
 val_size = 1
-epochs = 60
+epochs = 500
 lr = 0.001
 num_class = 8
 img_num = 6
-num_crops = 400
+num_crops = 200
 whole_image_output = True
-size_img = (1500,2000)
-size_crops = (100,100)
+size_img = (3000,4000)
+size_crops = (200,200)
 # PATH
 mask_path = './imgs/masks/'
 input_path = './imgs/inputs/'
@@ -95,7 +95,7 @@ def main():
         validation_loss.append(vloss_tmp)
 
         # SAVE IMAGES
-        if (epoch in range(5) or (epoch % (math.floor(epochs/10))) == 0 or epoch == epochs - 1): # Epoch [1, 2, 3, 4, 5, n mod 50, epochs] are printed
+        if (epoch in range(5) or (epoch % (math.floor(epochs/10))) == 0 or epoch == epochs - 1 or float(accuracy_tmp)>0.5): # Epoch [1, 2, 3, 4, 5, n mod 50, epochs] are printed
             if whole_image_output:    
                 save_img_whole(outputs, epoch)
             else:

@@ -27,6 +27,7 @@ def validate(model, num_class, val_loader, device, output_list, criterion):
             # DICE COEFFICIENT
             dice = dice_coefficient(y_pred, targets)
 
+        print(len(val_loader))
         val_loss = loss / len(val_loader)
         acc = acc/len(val_loader)
         print('Validation loss: {:.3f}'.format(val_loss))
