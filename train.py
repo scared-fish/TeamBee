@@ -41,7 +41,7 @@ def train(model, num_class, epoch, optimizer, criterion, train_loader, epochs, d
     acc = acc / len(train_loader)
     dice = dice/ len(train_loader)
 
-    print('\nEpoch [{}/{}], Training Loss: {:.4f}'.format(epoch + 1, epochs, total_loss.item()))
+    print('\nEpoch [{}/{}], \nTraining Loss: {:.4f}'.format(epoch + 1, epochs, total_loss.item()))
     print('Training Accuracy: {:.3f}'.format(acc))
     print('Training Dice-Coefficient: {:.3f}'.format(dice))
     print('-' * 60)

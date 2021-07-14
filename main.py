@@ -97,7 +97,6 @@ def main():
         tdice.append(tdice_tmp)
         dice.append(dice_tmp)
 
-
         # SAVE IMAGES
         if whole_image_output and (epoch % 2 == 0) or (epoch == epochs - 1):    # Epoch [1, 2, 3, 4, 5, n mod 50, epochs] are printed
             save_img_whole(outputs, epoch)
